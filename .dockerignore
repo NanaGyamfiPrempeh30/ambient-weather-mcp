@@ -1,0 +1,25 @@
+# Secret keys (NEVER bake into an image)
+.env
+
+# Git history (not needed at runtime)
+.git/
+.gitignore
+
+# Virtual environment (we install fresh inside the container)
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+
+# Documentation (not needed at runtime)
+README.md
+LICENSE
