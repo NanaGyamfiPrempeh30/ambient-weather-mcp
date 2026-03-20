@@ -1,0 +1,19 @@
+# =============================================================================
+# Ambient Weather MCP Server - Python Dependencies
+# =============================================================================
+# Install with: pip install -r requirements.txt
+#
+# We're keeping this minimal for now. We'll add more as we need them.
+
+# --- MCP Framework ---
+# This is the official MCP Python SDK by Anthropic.
+# It includes "FastMCP" - a high-level wrapper that makes defining
+# MCP tools simple (similar to how FastAPI simplifies REST APIs).
+# The [cli] extra gives us the "mcp" command-line tool for testing.
+mcp[cli]>=1.2.0,<2.0.0
+
+# --- Environment Variable Management ---
+# Loads API keys from a .env file during local development.
+# In Docker, env vars are passed via -e flags instead, so this
+# becomes a no-op. But it's convenient for local work.
+python-dotenv>=1.0.0,<2.0.0

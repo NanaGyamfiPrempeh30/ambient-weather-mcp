@@ -1,0 +1,22 @@
+# Environment variables file (contains your secret API keys!)
+# NEVER commit this. Use .env.example as a template instead.
+.env
+
+# Python bytecode (auto-generated when Python runs your code)
+__pycache__/
+*.py[cod]
+
+# Virtual environment (local Python packages - too big for Git)
+venv/
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
+
+# Test caches
+.pytest_cache/
