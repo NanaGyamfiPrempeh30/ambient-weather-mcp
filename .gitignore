@@ -20,3 +20,7 @@ venv/
 
 # Test caches
 .pytest_cache/
+
+# Kubernetes secret manifest (contains real API keys — never commit this)
+# Use kubernetes/secret.yaml.example as a template
+kubernetes/secret.yaml

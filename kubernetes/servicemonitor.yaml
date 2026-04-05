@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ambient-weather-mcp
+  namespace: ambient-weather-mcp
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: ambient-weather-mcp
+  endpoints:
+    - port: "8080"
+      path: /metrics

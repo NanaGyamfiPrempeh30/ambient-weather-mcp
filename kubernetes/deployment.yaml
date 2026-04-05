@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ambient-weather-mcp
+  namespace: ambient-weather-mcp
+  labels:
+    app: ambient-weather-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ambient-weather-mcp
+  template:
+    metadata:
+      labels:
+        app: ambient-weather-mcp
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: ambient-weather-mcp
+          securityContext:
+            readOnlyRootFilesystem: true
+          image: ghcr.io/nanagyamfiprempeh30/ambient-weather-mcp:latest
+          envFrom:
+            - secretRef:
+                name: ambient-weather-mcp-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          startupProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "from src.server import mcp; print('OK')"
+            failureThreshold: 30
+            periodSeconds: 10
