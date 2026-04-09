@@ -58,7 +58,7 @@ jobs:
       - name: Smoke test
         run: |
           docker run --rm ${{ env.IMAGE_NAME }}:latest \
-            python -c "from src.server import mcp; print('OK')"
+            uv run python -c "from src.server import mcp; print('OK')"
 
       - name: Push Docker image
         if: github.event_name == 'push'
