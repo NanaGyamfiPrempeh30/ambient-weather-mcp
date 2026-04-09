@@ -54,3 +54,13 @@ Tracks every error encountered, root cause, and resolution.
 **Root cause:** TruffleHog's built-in auto-updater tries to replace its own binary on disk but fails due to Windows file locking or path resolution in Git Bash.
 **Impact:** Cosmetic only. The scan itself runs successfully after the updater error. Secret detection works correctly.
 **Fix:** Add `--no-update` flag to the pre-commit entry command to suppress the auto-updater, or ignore the error since the scan still completes.
+
+## Issue #9: Smoke test failed after uv migration
+**Date:** 2026-04-09
+**Error:** Smoke test step in GitHub Actions failed with exit code 1.
+**Root cause:** Dockerfile was updated to use uv, but the smoke test in
+build-and-push.yml still called bare `python` instead of `uv run python`.
+The container's Python can't find packages without uv's environment.
+**Fix:** Changed smoke test command from `python -c "..."` to `uv run python -c "..."`.
+**Lesson:** When migrating a tool (pip → uv), trace every place the old tool
+is referenced: Dockerfile, CI workflows, README, run scripts.
