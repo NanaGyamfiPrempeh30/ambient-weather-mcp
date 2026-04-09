@@ -46,8 +46,9 @@ The AI calls the tool, the server fetches live data from the Ambient Weather RES
 1. **Ambient Weather API keys** — generate both at https://dashboard.ambientweather.net/account
    - **Application Key**: identifies the MCP server app
    - **API Key**: grants read access to device data
-2. **Python 3.11+** installed
-3. **An Ambient Weather station** reporting to ambientweather.net (or access to someone's API key who has one)
+2. **Python 3.13+** installed
+3. **uv** — modern Python package manager. Install: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+4. **An Ambient Weather station** reporting to ambientweather.net (or access to someone's API key who has one)
 
 ## Setup (Local Development)
 
@@ -56,20 +57,15 @@ The AI calls the tool, the server fetches live data from the Ambient Weather RES
 git clone https://github.com/NanaGyamfiPrempeh30/ambient-weather-mcp.git
 cd ambient-weather-mcp
 
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate        # Linux/macOS
-source venv/Scripts/activate    # Windows Git Bash
-
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (uv creates .venv automatically)
+uv sync
 
 # Configure API keys
-cp .env.example ~/.env
+cp .env.example .env
 # Edit .env with your actual keys
 
 # Test the server
-python3 -c "from src.server import ping; import asyncio; print(asyncio.run(ping()))"
+uv run python -c "from src.server import ping; import asyncio; print(asyncio.run(ping()))"
 ```
 
 You should see:
@@ -114,8 +110,8 @@ Add to Claude Desktop config:
 {
   "mcpServers": {
     "ambient-weather": {
-      "command": "python3",
-      "args": ["-m", "src"],
+      "command": "uv",
+      "args": ["run", "python", "-m", "src"],
       "cwd": "/path/to/ambient-weather-mcp",
       "env": {
         "AMBIENT_API_KEY": "your-api-key",
@@ -143,22 +139,55 @@ docker run -i --rm \
   ambient-weather-mcp
 ```
 
+The Docker image is also published to GitHub Container Registry on every push to main:
+```bash
+docker pull ghcr.io/nanagyamfiprempeh30/ambient-weather-mcp:latest
+```
+
+## CI/CD
+
+Every push to `main` triggers two GitHub Actions workflows:
+
+- **Build and Push** — builds the Docker image, runs a smoke test, and pushes to ghcr.io with `latest` and commit SHA tags
+- **Secret Scanning** — runs TruffleHog to detect accidentally committed secrets
+
+A pre-commit hook (TruffleHog) also scans locally before every commit. See `.pre-commit-config.yaml` for setup instructions.
+
 ## Project Structure
 
 ```
 ambient-weather-mcp/
+├── .github/
+│   └── workflows/
+│       ├── build-and-push.yml   # Docker build + push to ghcr.io
+│       └── secret-scan.yml      # TruffleHog secret scanning
+├── .kiro/
+│   └── specs/
+│       ├── requirements.md      # EARS-format requirements
+│       ├── design.md            # Technical architecture
+│       └── tasks.md             # Implementation tasks
+├── kubernetes/
+│   ├── namespace.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   ├── servicemonitor.yaml
+│   └── secret.yaml.example     # Secret template (safe to commit)
 ├── src/
-│   ├── __init__.py          # Package marker
-│   ├── __main__.py          # Entry point for python -m src
-│   ├── server.py            # MCP server + tool definitions
-│   └── ambient_client.py    # Ambient Weather REST API client
-├── .env.example             # API key template (safe to commit)
-├── .gitignore               # Excludes .env, venv, __pycache__
-├── .dockerignore             # Excludes secrets from Docker image
-├── Dockerfile               # Container build recipe
-├── run_mcp.bat              # Windows launcher for Claude Desktop
-├── requirements.txt         # Python dependencies
-└── README.md                # This file
+│   ├── __init__.py              # Package marker
+│   ├── __main__.py              # Entry point for python -m src
+│   ├── server.py                # MCP server + tool definitions
+│   └── ambient_client.py        # Ambient Weather REST API client
+├── .env.example                 # API key template (safe to commit)
+├── .gitignore                   # Excludes .env, .venv, __pycache__
+├── .dockerignore                # Excludes secrets from Docker image
+├── .pre-commit-config.yaml      # TruffleHog pre-commit hook
+├── Dockerfile                   # Container build recipe (uses uv)
+├── pyproject.toml               # Python dependencies (managed by uv)
+├── uv.lock                      # Locked dependency versions
+├── run_mcp.bat                  # Windows launcher for Claude Desktop
+├── DEBUG_LOG.md                 # Error tracking log
+└── README.md                    # This file
 ```
 
 ## API Rate Limits
@@ -180,9 +209,9 @@ The server includes a 60-second TTL cache to stay within these limits automatica
 
 ## Troubleshooting
 
-**"No module named src"** — Python can't find the project. Make sure you're running from the project root directory, or use the batch file approach on Windows.
+**"No module named src"** — Make sure you're running from the project root directory. On Windows with Claude Desktop, use the `cmd.exe` + batch file method shown above.
 
-**"Server disconnected" in Claude Desktop** — On Windows, use the `cmd.exe` + batch file method shown above. Direct Python execution has working directory issues with Claude Desktop.
+**"Server disconnected" in Claude Desktop** — On Windows, use the `cmd.exe` + batch file method. Direct Python execution has working directory issues with Claude Desktop on Windows.
 
 **"401 Unauthorized"** — API keys are invalid. Regenerate at https://dashboard.ambientweather.net/account
 
@@ -190,14 +219,22 @@ The server includes a 60-second TTL cache to stay within these limits automatica
 
 **"429 Too Many Requests"** — Rate limit hit. Wait a few seconds. Increase `CACHE_TTL_SECONDS` if it keeps happening.
 
+See `DEBUG_LOG.md` for a full history of issues encountered and their resolutions.
+
 ## What's Next
 
+- [x] CI/CD pipeline (GitHub Actions → ghcr.io)
+- [x] Kubernetes manifests for ArgoCD deployment
+- [x] Kiro spec-driven workflow (requirements, design, tasks)
+- [x] TruffleHog secret scanning (pre-commit + GitHub Actions)
+- [x] Migrate from pip to uv
 - [ ] `get_weather_history` tool for historical data queries
-- [ ] Publish Docker image to Docker Hub
-- [ ] Comprehensive README with Wilson's station as a live demo
-- [ ] Extend with Kiro spec-driven workflow for additional features
+- [ ] Security scanning tools (ruff, bandit, semgrep, safety)
+- [ ] Replace .env with proper secrets management
+- [ ] HTTP transport for network-based deployment
+- [ ] Publish to MCP marketplaces (mcp.so, Smithery, Sevalla)
 - [ ] MCP OAuth authorization for secure multi-user access
-- [ ] Consider secrets manager integration (macOS Keychain, etc.)
+- [ ] Medium article as Claude Partner Network case study
 
 ## Credits
 
