@@ -53,9 +53,16 @@ logger = logging.getLogger("ambient-weather-mcp")
 # -------------------------------------------------------------------------
 # Step 2: Read API keys and create the API client
 # -------------------------------------------------------------------------
+# Keys are loaded in this order:
+#   1. Environment variables (Docker, CI, Claude Desktop config)
+#   2. OS keyring (local development — set via: uv run python -m src.setup_keys)
+#   3. .env file fallback (loaded by dotenv above, if file exists)
 
-AMBIENT_API_KEY = os.getenv("AMBIENT_API_KEY", "")
-AMBIENT_APP_KEY = os.getenv("AMBIENT_APP_KEY", "")
+from src.keyring_store import get_keys
+
+_keys = get_keys()
+AMBIENT_API_KEY = _keys["api_key"]
+AMBIENT_APP_KEY = _keys["app_key"]
 
 # The API client is None if keys are missing.
 # Each tool checks for this and returns a helpful error message.
@@ -71,14 +78,13 @@ if AMBIENT_API_KEY and AMBIENT_APP_KEY:
     except ValueError as e:
         logger.error("Failed to create API client: %s", e)
 else:
-    if not AMBIENT_API_KEY:
-        logger.warning("AMBIENT_API_KEY is not set.")
-    if not AMBIENT_APP_KEY:
-        logger.warning("AMBIENT_APP_KEY is not set.")
     logger.warning(
-        "Weather tools will return errors until both keys are configured. "
-        "Get your keys at https://dashboard.ambientweather.net/account"
+        "API keys not found. Set them using one of:\n"
+        "  1. uv run python -m src.setup_keys (stores in OS keyring)\n"
+        "  2. Environment variables: AMBIENT_API_KEY, AMBIENT_APP_KEY\n"
+        "  3. .env file in project root"
     )
+
 
 
 # -------------------------------------------------------------------------
