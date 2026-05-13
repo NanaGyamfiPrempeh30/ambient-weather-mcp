@@ -64,12 +64,12 @@ def get_keys() -> dict[str, str]:
     if not api_key:
         logger.warning(
             "AMBIENT_API_KEY not found in environment or keyring. "
-            "Run: uv run python -m src.setup_keys"
+            "Run: uv run python -m ambient_weather_mcp.setup_keys"
         )
     if not app_key:
         logger.warning(
             "AMBIENT_APP_KEY not found in environment or keyring. "
-            "Run: uv run python -m src.setup_keys"
+            "Run: uv run python -m ambient_weather_mcp.setup_keys"
         )
 
     return {"api_key": api_key, "app_key": app_key}

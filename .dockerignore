@@ -1,25 +1,43 @@
 # Secret keys (NEVER bake into an image)
 .env
+.env.*
+!.env.example
 
-# Git history (not needed at runtime)
+# Git
 .git/
 .gitignore
+.github/
 
-# Virtual environment (we install fresh inside the container)
+# Virtual environments
 venv/
 .venv/
 
-# Python cache
+# Python build artifacts
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
 
-# IDE files
+# IDE / OS
 .idea/
 .vscode/
-
-# OS files
+.kiro/
 .DS_Store
 
-# Documentation (not needed at runtime)
-README.md
+# Tests and dev artifacts
+tests/
+.pytest_cache/
+.ruff_cache/
+
+# Documentation (LICENSE, debug logs, security policy not needed at runtime)
 LICENSE
+DEBUG_LOG.md
+SECURITY.md
+docs/
+
+# Docker / CI metadata
+Dockerfile
+.dockerignore
+.pre-commit-config.yaml

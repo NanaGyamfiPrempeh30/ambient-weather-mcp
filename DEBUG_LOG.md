@@ -64,3 +64,6 @@ The container's Python can't find packages without uv's environment.
 **Fix:** Changed smoke test command from `python -c "..."` to `uv run python -c "..."`.
 **Lesson:** When migrating a tool (pip → uv), trace every place the old tool
 is referenced: Dockerfile, CI workflows, README, run scripts.
+
+## Issue #10: Drop keyring dependency on advice of code review
+Initially agreed to drop keyring dependency on advice of code review. Re-discovered during smoke test that server.py uses keyring_store for dual-path credential loading (OS keyring locally, env vars in containers). Reinstated keyring as a runtime dependency, moved keyring_store.py into package.

@@ -33,7 +33,7 @@ import logging
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
-from src.ambient_client import AmbientWeatherClient, AmbientWeatherError
+from .ambient_client import AmbientWeatherClient
 
 
 # -------------------------------------------------------------------------
@@ -55,10 +55,10 @@ logger = logging.getLogger("ambient-weather-mcp")
 # -------------------------------------------------------------------------
 # Keys are loaded in this order:
 #   1. Environment variables (Docker, CI, Claude Desktop config)
-#   2. OS keyring (local development — set via: uv run python -m src.setup_keys)
+#   2. OS keyring (local development — set via: uv run python -m ambient_weather_mcp.setup_keys)
 #   3. .env file fallback (loaded by dotenv above, if file exists)
 
-from src.keyring_store import get_keys
+from .keyring_store import get_keys
 
 _keys = get_keys()
 AMBIENT_API_KEY = _keys["api_key"]
@@ -80,7 +80,7 @@ if AMBIENT_API_KEY and AMBIENT_APP_KEY:
 else:
     logger.warning(
         "API keys not found. Set them using one of:\n"
-        "  1. uv run python -m src.setup_keys (stores in OS keyring)\n"
+        "  1. uv run python -m ambient_weather_mcp.setup_keys (stores in OS keyring)\n"
         "  2. Environment variables: AMBIENT_API_KEY, AMBIENT_APP_KEY\n"
         "  3. .env file in project root"
     )
@@ -93,6 +93,7 @@ else:
 
 mcp = FastMCP(
     name="ambient-weather",
+    version="0.1.0",
     instructions=(
         "Access real-time and historical data from Ambient Weather "
         "personal weather stations. Use get_devices first to find "
