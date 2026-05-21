@@ -1,0 +1,25 @@
+# Auto-detect text files and normalize line endings to LF on commit
+* text=auto eol=lf
+
+# Explicitly enforce LF for all critical text files
+*.py text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.lock text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+.gitignore text eol=lf
+.python-version text eol=lf
+
+# Windows-only files keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.pdf binary

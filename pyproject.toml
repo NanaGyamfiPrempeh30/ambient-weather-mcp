@@ -1,16 +1,49 @@
 [project]
 name = "ambient-weather-mcp"
 version = "0.1.0"
-description = "MCP server for Ambient Weather personal weather station data"
-requires-python = ">=3.13"
-dependencies = [
-    "keyring>=25.7.0",
-    "mcp[cli]>=1.2.0,<2.0.0",
+description = "MCP server exposing Ambient Weather personal station data to AI assistants"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Yaw Nana Gyamfi Prempeh", email = "yawgyamfiprempeh27@gmail.com" }
 ]
+keywords = ["mcp", "model-context-protocol", "ambient-weather", "weather", "ai-tools"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = [
+  "mcp[cli]>=1.2.0,<2.0.0",
+  "httpx>=0.27.0",
+  "keyring>=25.7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/NanaGyamfiPrempeh30/ambient-weather-mcp"
+Repository = "https://github.com/NanaGyamfiPrempeh30/ambient-weather-mcp"
+Issues = "https://github.com/NanaGyamfiPrempeh30/ambient-weather-mcp/issues"
+Documentation = "https://github.com/NanaGyamfiPrempeh30/ambient-weather-mcp#readme"
+
+[project.scripts]
+ambient-weather-mcp = "ambient_weather_mcp.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ambient_weather_mcp"]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.10",
-    "safety>=3.7.0",
-    "semgrep>=1.136.0",
+  "ruff>=0.15.10",
+  "safety>=3.7.0",
+  "semgrep>=1.136.0",
 ]
